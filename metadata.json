@@ -1,0 +1,5 @@
+{
+  "name": "Stock Transfer Pro",
+  "description": "A professional stock transfer management application for retail inventory.",
+  "requestFramePermissions": ["camera"]
+}
