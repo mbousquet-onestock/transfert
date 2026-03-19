@@ -41,7 +41,7 @@ interface Transfer {
   id: string;
   location: string;
   date: string;
-  status: 'En attente d\'approbation' | 'Annulé' | 'Approuvé';
+  status: 'En attente d\'approbation' | 'Annulé' | 'Approuvé' | 'Expédié';
   items: TransferItem[];
   parcels: number;
   trackingNumber: string;
@@ -112,9 +112,9 @@ const Button = ({
   disabled?: boolean;
 }) => {
   const variants = {
-    primary: "bg-[#26C6DA] text-white hover:bg-[#00ACC1]",
+    primary: "bg-[#28B0A4] text-white hover:bg-[#239B90]",
     secondary: "bg-white text-gray-700 border border-gray-300 hover:bg-gray-50",
-    outline: "bg-transparent text-[#26C6DA] border border-[#26C6DA] hover:bg-[#26C6DA]/10",
+    outline: "bg-transparent text-[#28B0A4] border border-[#28B0A4] hover:bg-[#28B0A4]/10",
     danger: "bg-red-500 text-white hover:bg-red-600",
   };
 
@@ -288,6 +288,10 @@ export default function App() {
     setTransfers(transfers.map(t => t.id === id ? { ...t, status: 'Annulé' } : t));
   };
 
+  const shipTransfer = (id: string) => {
+    setTransfers(transfers.map(t => t.id === id ? { ...t, status: 'Expédié' } : t));
+  };
+
   const handleItemKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === 'Enter') {
       const scannedProduct = PRODUCTS.find(p => p.sku === searchQuery);
@@ -301,7 +305,7 @@ export default function App() {
   };
 
   return (
-    <div className="min-h-screen bg-[#F5F7F8] font-sans text-gray-900">
+    <div className="min-h-screen bg-[#E0E0E0] font-sans text-gray-900">
       {view === 'list' ? (
         <>
           <main className="p-4 max-w-2xl mx-auto">
@@ -341,10 +345,13 @@ export default function App() {
                               ? 'bg-blue-100 text-blue-600' 
                               : transfer.status === 'Approuvé'
                                 ? 'bg-green-100 text-green-600'
-                                : 'bg-red-100 text-red-600'
+                                : transfer.status === 'Expédié'
+                                  ? 'bg-indigo-100 text-indigo-600'
+                                  : 'bg-red-100 text-red-600'
                           }`}>
                             {transfer.status === 'En attente d\'approbation' && <Clock size={10} />}
                             {transfer.status === 'Approuvé' && <Check size={10} />}
+                            {transfer.status === 'Expédié' && <Truck size={10} />}
                             {transfer.status === 'Annulé' && <X size={10} />}
                             {transfer.status}
                           </span>
@@ -359,6 +366,22 @@ export default function App() {
                           >
                             Annuler
                           </button>
+                        )}
+                        {transfer.status === 'Approuvé' && (
+                          <div className="flex flex-col gap-2">
+                            <button 
+                              onClick={() => shipTransfer(transfer.id)}
+                              className="px-4 py-1.5 bg-[#28B0A4] text-white rounded-md text-sm font-medium hover:bg-[#239B90]"
+                            >
+                              Expédié
+                            </button>
+                            <button 
+                              onClick={() => cancelTransfer(transfer.id)}
+                              className="px-4 py-1.5 border border-gray-300 rounded-md text-sm font-medium hover:bg-gray-50"
+                            >
+                              Annuler
+                            </button>
+                          </div>
                         )}
                         <button 
                           onClick={() => setExpandedId(expandedId === transfer.id ? null : transfer.id)}
@@ -447,7 +470,7 @@ export default function App() {
                       // Small delay to allow clicking on the dropdown items
                       setTimeout(() => setIsLocationDropdownOpen(false), 200);
                     }}
-                    className="w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-[#26C6DA] focus:border-transparent outline-none pr-10"
+                    className="w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-[#28B0A4] focus:border-transparent outline-none pr-10"
                   />
                   <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" size={20} />
                 </div>
@@ -493,7 +516,7 @@ export default function App() {
                           setSelectedProduct(null);
                         }}
                         onKeyDown={handleItemKeyDown}
-                        className="w-full p-3 pl-10 border border-gray-300 rounded-md focus:ring-2 focus:ring-[#26C6DA] focus:border-transparent outline-none"
+                        className="w-full p-3 pl-10 border border-gray-300 rounded-md focus:ring-2 focus:ring-[#28B0A4] focus:border-transparent outline-none"
                       />
                       <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
                     </div>
@@ -534,13 +557,13 @@ export default function App() {
                     type="number"
                     value={quantity || ''}
                     onChange={(e) => setQuantity(parseInt(e.target.value) || 0)}
-                    className="w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-[#26C6DA] focus:border-transparent outline-none text-center"
+                    className="w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-[#28B0A4] focus:border-transparent outline-none text-center"
                   />
                 </div>
                 <button 
                   onClick={addItem}
                   disabled={!selectedProduct || quantity <= 0}
-                  className="bg-[#26C6DA] text-white p-3 rounded-md hover:bg-[#00ACC1] disabled:opacity-50 flex items-center gap-2 font-bold"
+                  className="bg-[#28B0A4] text-white p-3 rounded-md hover:bg-[#239B90] disabled:opacity-50 flex items-center gap-2 font-bold"
                 >
                   <Plus size={20} /> Ajouter
                 </button>
@@ -604,7 +627,7 @@ export default function App() {
                   type="text"
                   value={trackingNumber}
                   onChange={(e) => setTrackingNumber(e.target.value)}
-                  className="w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-[#26C6DA] focus:border-transparent outline-none"
+                  className="w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-[#28B0A4] focus:border-transparent outline-none"
                 />
               </div>
             </Card>

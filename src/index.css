@@ -13,7 +13,7 @@
 }
 
 #reader__dashboard_section_csr button {
-  @apply bg-[#26C6DA] text-white px-4 py-2 rounded-md font-bold hover:bg-[#00ACC1] transition-colors border-none cursor-pointer;
+  @apply bg-[#28B0A4] text-white px-4 py-2 rounded-md font-bold hover:bg-[#239B90] transition-colors border-none cursor-pointer;
 }
 
 #reader__dashboard_section_csr select {
